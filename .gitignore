@@ -1,0 +1,11 @@
+dataset/ 
+# Ignore all weights
+*.pth
+*.pth.tar
+*.pt
+*.weights
+
+# Ignore specific weight directories
+1. YOLOX/weights/
+2. FastReID/weights/
+
