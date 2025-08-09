@@ -9,3 +9,9 @@ dataset/
 1. YOLOX/weights/
 2. FastReID/weights/
 
+# Ignore python cache and compiled files
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+*.py[cod]
