@@ -15,3 +15,5 @@ dataset/
 *.pyd
 __pycache__/
 *.py[cod]
+*.pickle
+
