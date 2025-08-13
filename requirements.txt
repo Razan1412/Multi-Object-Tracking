@@ -4,6 +4,7 @@ annotated-types==0.7.0
 anywidget==0.9.18
 asttokens==3.0.0
 bbox_visualizer==0.2.2
+beautifulsoup4==4.13.4
 certifi==2025.8.3
 charset-normalizer==3.4.3
 comm==0.2.3
@@ -21,6 +22,7 @@ filetype==1.2.0
 fonttools==4.59.0
 fsspec==2025.7.0
 ftfy==6.3.1
+gdown==5.2.0
 grpcio==1.74.0
 hf-xet==1.1.7
 huggingface-hub==0.34.4
@@ -83,6 +85,7 @@ pydantic_core==2.33.2
 Pygments==2.19.2
 pylabel==0.1.55
 pyparsing==3.2.3
+PySocks==1.7.1
 python-dateutil==2.9.0.post0
 python-dotenv==1.1.1
 pytz==2025.2
@@ -91,12 +94,13 @@ regex==2025.7.34
 requests==2.32.4
 requests-toolbelt==1.0.0
 rf100vl==1.0.0
--e git+https://github.com/Razan1412/Multi-Object-Tracking.git@242610b5c58e56cf01b5bd0699c74ab49bb9dc2d#egg=rfdetr&subdirectory=4. RF-DETR
+rfdetr==1.2.1
 roboflow==1.2.3
 safetensors==0.6.2
 scikit-learn==1.6.1
 scipy==1.13.1
 six==1.17.0
+soupsieve==2.7
 stack-data==0.6.3
 supervision==0.26.1
 sympy==1.14.0
@@ -109,6 +113,7 @@ threadpoolctl==3.6.0
 timm==1.0.19
 tokenizers==0.21.4
 torch==2.8.0
+torchreid==0.2.5
 torchvision==0.23.0
 tqdm==4.67.1
 traitlets==5.14.3
