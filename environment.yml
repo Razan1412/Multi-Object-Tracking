@@ -1,4 +1,4 @@
-name: rfdetr39
+name: task2-3env
 channels:
   - conda-forge
 dependencies:
