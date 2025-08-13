@@ -23,7 +23,7 @@ def make_parser():
                         help="Path to the MOT17 validation JSON file.")
     parser.add_argument("--dataset_root", type=str, default="dataset",
                         help="Root directory of the 'Multi-Object-Tracking' project.")
-    parser.add_argument("--output_dir", type=str, default="outputs/4. det",
+    parser.add_argument("--output_dir", type=str, default="outputs/4. rfdet",
                         help="Directory to save the output pickle files.")
     parser.add_argument("--model_size", type=str, default="medium",
                         help="Size of the RF-DETR model to load ('base', 'medium', etc.).")
