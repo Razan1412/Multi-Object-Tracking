@@ -133,7 +133,7 @@ def run():
 
     # Evaluation
     if args.mode == 'val':
-        print('Evaluating...')
+        print('Evaluating...\n')
         evaluate(args, trackers_to_eval + '_post', args.dataset)
 
     # Logging
