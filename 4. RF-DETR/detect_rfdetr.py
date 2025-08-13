@@ -6,49 +6,37 @@ import argparse
 import numpy as np
 from PIL import Image
 from tqdm import tqdm
+import warnings
+from torch.jit import TracerWarning
 
-# Import the high-level RFDETR class from the library
 from rfdetr import RFDETRBase
 
 def make_parser():
-    """Creates the argument parser for the detection script."""
     parser = argparse.ArgumentParser("RF-DETR Detection Script for TrackTrack")
-
-    # Parser arguments
     parser.add_argument("--weights", type=str,
-                        default="4. RF-DETR/rf-detr-base.pth",
-                        help="Path to the local RF-DETR model weights (if supported by the library).")
+                        default="4. RF-DETR/rf-detr-base.pth")
     parser.add_argument("--json_path", type=str,
-                        default="4. RF-DETR/jsons/mot17_val.json",
-                        help="Path to the MOT17 validation JSON file.")
-    parser.add_argument("--dataset_root", type=str, default="dataset",
-                        help="Root directory of the 'Multi-Object-Tracking' project.")
-    parser.add_argument("--output_dir", type=str, default="outputs/4. rfdet",
-                        help="Directory to save the output pickle files.")
-    parser.add_argument("--model_size", type=str, default="medium",
-                        help="Size of the RF-DETR model to load ('base', 'medium', etc.).")
+                        default="4. RF-DETR/jsons/mot17_val.json")
+    parser.add_argument("--dataset_root", type=str, default="dataset")
+    parser.add_argument("--output_dir", type=str, default="outputs/4. rfdet")
+    parser.add_argument("--model_size", type=str, default="medium")
     parser.add_argument("--conf_thresholds", type=float, nargs='+',
-                        default=[0.80, 0.95],
-                        help="A list of confidence thresholds to apply for filtering.")
-    parser.add_argument("--device", type=str, default="cuda",
-                        help="Device to run the model on ('cuda' or 'cpu').")
-
+                        default=[0.80, 0.95])
+    parser.add_argument("--device", type=str, default="cuda")
+    parser.add_argument("--batch_size", type=int, default=8,  # Added batch inference
+                        help="Number of images per inference batch")
     return parser
 
 def main(args):
-    """Main detection and saving logic."""
-    print("Initializing RF-DETR detection script with the following arguments:")
-    print(args)
-
-    # Ensure output directory exists
     os.makedirs(args.output_dir, exist_ok=True)
 
-    # Model Loading
-    print(f"Loading RF-DETR model (size: {args.model_size})...")
-    model = RFDETRBase(size=args.model_size)
+    print(f"Loading RF-DETR Base...")
+    model = RFDETRBase()
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", category=TracerWarning)
+        model.optimize_for_inference(batch_size=args.batch_size)
     print("Model loaded successfully.")
 
-    # Data Preparation
     print(f"Loading data from {args.json_path}...")
     with open(args.json_path, 'r') as f:
         data = json.load(f)
@@ -61,62 +49,80 @@ def main(args):
             if video_name not in results[f"thresh_{thresh}"]:
                 results[f"thresh_{thresh}"][video_name] = {}
 
-    # Inference Loop
-    print(f"Running inference on {len(images_info)} images...")
+    print(f"Running inference on {len(images_info)} images (batch size {args.batch_size})...")
+    batch_images = []
+    batch_meta = []
+
     for img_info in tqdm(images_info, desc="Processing images"):
         img_path = os.path.join(args.dataset_root, img_info['file_name'])
         image = Image.open(img_path).convert("RGB")
-        img_w, img_h = image.size
-        predictions = model.predict(image)
+        batch_images.append(image)
+        batch_meta.append((img_info, image.size))
 
-        # Filter and Format detections
+        # If batch is full, process it
+        if len(batch_images) == args.batch_size:
+            process_batch(model, batch_images, batch_meta, results, args)
+            batch_images.clear()
+            batch_meta.clear()
+
+    # Process any leftover images
+    if batch_images:
+        # Pad to match args.batch_size
+        original_len = len(batch_images)
+        while len(batch_images) < args.batch_size:
+            batch_images.append(batch_images[-1])
+            batch_meta.append(batch_meta[-1])
+
+        process_batch(model, batch_images, batch_meta, results, args, trim_to=original_len)
+
+
+    print("Saving detection files...")
+    for thresh in args.conf_thresholds:
+        output_filename = f"mot17_val_{thresh:.2f}.pickle"
+        output_path = os.path.join(args.output_dir, output_filename)
+        with open(output_path, 'wb') as f:
+            pickle.dump(results[f"thresh_{thresh}"], f, protocol=pickle.HIGHEST_PROTOCOL)
+        print(f"  -> Saved detections to {output_path}")
+
+    print("\nDetection complete. The output files are ready for the FastReID step.")
+
+def process_batch(model, images, meta, results, args, trim_to=None):
+    predictions_list = model.predict(images)  # Batch predict
+
+    # If we padded, trim the predictions and metadata back
+    if trim_to is not None:
+        predictions_list = predictions_list[:trim_to]
+        meta = meta[:trim_to]
+
+    for pred, (img_info, (img_w, img_h)) in zip(predictions_list, meta):
         for thresh in args.conf_thresholds:
-            keep = predictions.confidence > thresh
-            
-            filtered_xyxy = predictions.xyxy[keep]
-            
-            # Clip boxes to image boundaries to prevent invalid crops
+            keep = pred.confidence > thresh
+            filtered_xyxy = pred.xyxy[keep]
+
             if filtered_xyxy.shape[0] > 0:
                 filtered_xyxy[:, 0] = np.maximum(0, filtered_xyxy[:, 0])
                 filtered_xyxy[:, 1] = np.maximum(0, filtered_xyxy[:, 1])
                 filtered_xyxy[:, 2] = np.minimum(img_w, filtered_xyxy[:, 2])
                 filtered_xyxy[:, 3] = np.minimum(img_h, filtered_xyxy[:, 3])
 
-            # Filter out boxes with zero or negative width/height after clipping
-            valid_boxes_mask = (filtered_xyxy[:, 2] > filtered_xyxy[:, 0]) & (filtered_xyxy[:, 3] > filtered_xyxy[:, 1])
-            
-            # Always define detections_array. If there are valid boxes, create the array.
-            # Otherwise, create an empty array. This prevents KeyErrors downstream.
+            valid_boxes_mask = (filtered_xyxy[:, 2] > filtered_xyxy[:, 0]) & \
+                               (filtered_xyxy[:, 3] > filtered_xyxy[:, 1])
+
             if np.any(valid_boxes_mask):
                 final_boxes = filtered_xyxy[valid_boxes_mask]
-                final_scores = predictions.confidence[keep][valid_boxes_mask]
-                final_classes = predictions.class_id[keep][valid_boxes_mask]
-
+                final_scores = pred.confidence[keep][valid_boxes_mask]
+                final_classes = pred.class_id[keep][valid_boxes_mask]
                 detections_array = np.hstack([
                     final_boxes,
                     final_scores[:, np.newaxis],
                     final_classes[:, np.newaxis]
                 ])
             else:
-                # If no valid boxes, create an empty array for this frame
                 detections_array = np.empty((0, 6))
 
-            # Store the result for every frame
             video_name = img_info['file_name'].split('/')[2]
             frame_id = img_info['frame_id']
             results[f"thresh_{thresh}"][video_name][frame_id] = detections_array
-
-    # Save Outputs 
-    print("Saving detection files...")
-    for thresh in args.conf_thresholds:
-        output_filename = f"mot17_val_{thresh:.2f}.pickle"
-        output_path = os.path.join(args.output_dir, output_filename)
-        
-        with open(output_path, 'wb') as f:
-            pickle.dump(results[f"thresh_{thresh}"], f, protocol=pickle.HIGHEST_PROTOCOL)
-        print(f"  -> Saved detections to {output_path}")
-
-    print("\nDetection complete. The output files are ready for the FastReID step.")
 
 
 if __name__ == "__main__":
