@@ -137,7 +137,7 @@ def run():
         evaluate(args, trackers_to_eval + '_post', args.dataset)
 
     # Logging
-    print("FPS: {:.2f}".format(total_count / total_time), flush=True)
+    print("Tracker FPS: {:.2f}".format(total_count / total_time), flush=True)
     print('', flush=True)
 
 
