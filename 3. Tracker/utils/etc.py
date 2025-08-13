@@ -139,4 +139,10 @@ def evaluate(args, trackers_to_eval, dataset):
     deta = np.mean(res['MotChallenge2DBox'][trackers_to_eval]['COMBINED_SEQ']['pedestrian']['HOTA']['DetA']).item()
 
     # Print
-    print('%.3f %.3f %.3f %.3f %.3f' % (hota * 100, idf1 * 100, mota * 100, assa * 100, deta * 100), flush=True)
+    print(
+        "HOTA: {:.3f}, IDF1: {:.3f}, MOTA: {:.3f}, AssA: {:.3f}, DetA: {:.3f}".format(
+            hota * 100, idf1 * 100, mota * 100, assa * 100, deta * 100
+        ),
+        flush=True
+    )
+
