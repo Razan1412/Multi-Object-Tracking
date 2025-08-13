@@ -85,7 +85,7 @@ All scripts are run from the `Multi-Object-Tracking` directory. Ensure a GPU is 
 
 - Achieved highest HOTA of **69.093**.
 
-![Result 1](assets/Task2_Best_Results.png)
+![Result 1](assets/Task2_Results.png)
 
 ### Task 3 – RF-DETR detector integration:
 
