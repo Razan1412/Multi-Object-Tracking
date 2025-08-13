@@ -8,6 +8,7 @@ from AFLink.model import PostLinker
 from AFLink.dataset import LinkData
 from trackers.tracker import Tracker
 from utils.gbi import gb_interpolation
+import csv
 
 
 def make_parser():
@@ -136,7 +137,7 @@ def run():
         evaluate(args, trackers_to_eval + '_post', args.dataset)
 
     # Logging
-    print(total_count / total_time, flush=True)
+    print("FPS: {:.2f}".format(total_count / total_time), flush=True)
     print('', flush=True)
 
 
