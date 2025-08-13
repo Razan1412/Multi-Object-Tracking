@@ -1,3 +1,59 @@
+# Multi-Object-Tracking
+
+This repo is forked from [TrackTrack](https://github.com/kamkyu94/TrackTrack) for the Lauretta.io Intern Take Home Assignment.
+
+## Setup Instructions
+
+1. Clone this repository:
+
+   ```bash
+   git clone https://github.com/Razan1412/Multi-Object-Tracking.git
+   cd Multi-Object-Tracking
+   ```
+
+2. If conda is available, simply create the environment based on the yml file:
+
+   ```bash
+   conda env create -f environment.yml
+   conda activate task2-3env
+   ```
+   Alternatively, you may directly install the requirements in your own Python 3.9 environment.
+
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+3. Download the [MOT17 Dataset](https://motchallenge.net/data/MOT17.zip) and place it in the `dataset/` directory. 
+
+4. YOLOX Setup: Download [mot17_half.pth.tar](https://drive.google.com/file/d/1R-eMf5SgwmizMkOjqJq3ZiurWBNGYf1j/view?usp=drive_link) and place it in `Multi-Object-Tracking/1. YOLOX/weights`.
+
+5. FastReID Setup: Download [mot17_half_sbs_S50.pth](https://drive.google.com/file/d/1kTG7mVNhYGicR0IXZ0Y1rebVoBRfOMGY/view?usp=drive_link) and place it in `Multi-Object-Tracking/2. FastReID/weights`.
+
+## Execution Instructions
+All commands are run from the Multi-Object-Tracking directory. Ensure a GPU is available.
+* **Task 2 – Baseline reproduction:**
+
+  ```bash
+  ./task2.sh
+  ```
+* **Task 3 – RF-DETR detector integration:**
+
+  ```bash
+  ./task3.sh
+  ```
+## Results
+
+* **Task 2 – Baseline reproduction:**
+
+  - Achieved highest HOTA of 69.093. 
+* **Task 3 – RF-DETR detector integration:**
+
+  - Achieved highest HOTA of 24.816.
+
+---
+
+## Original README from [TrackTrack](https://github.com/kamkyu94/TrackTrack)
+
 # TrackTrack
 [![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/focusing-on-tracks-for-online-multi-object/multi-object-tracking-on-mot17)](https://paperswithcode.com/sota/multi-object-tracking-on-mot17?p=focusing-on-tracks-for-online-multi-object)<br>
 [![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/focusing-on-tracks-for-online-multi-object/multi-object-tracking-on-mot20-1)](https://paperswithcode.com/sota/multi-object-tracking-on-mot20-1?p=focusing-on-tracks-for-online-multi-object)<br>
