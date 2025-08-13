@@ -152,4 +152,4 @@ dependencies:
       - widgetsnbextension==4.0.14
       - yacs==0.1.8
       - zipp==3.23.0
-prefix: /opt/conda/envs/rfdetr39
+prefix: /opt/conda/envs/task2-3env
