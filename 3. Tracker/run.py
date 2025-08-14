@@ -8,6 +8,7 @@ from AFLink.model import PostLinker
 from AFLink.dataset import LinkData
 from trackers.tracker import Tracker
 from utils.gbi import gb_interpolation
+import csv
 
 
 def make_parser():
@@ -16,7 +17,7 @@ def make_parser():
     # Basic
     parser.add_argument("--pickle_dir", type=str, default="../outputs/2. det_feat/")
     parser.add_argument("--output_dir", type=str, default="../outputs/3. track/")
-    parser.add_argument("--data_dir", type=str, default="../../dataset/")
+    parser.add_argument("--data_dir", type=str, default="../dataset/")
     parser.add_argument("--dataset", type=str, default="MOT17")
     parser.add_argument("--mode", type=str, default="val")
     parser.add_argument("--seed", type=float, default=10000)
@@ -132,11 +133,11 @@ def run():
 
     # Evaluation
     if args.mode == 'val':
-        print('Evaluating...')
+        print('Evaluating...\n')
         evaluate(args, trackers_to_eval + '_post', args.dataset)
 
     # Logging
-    print(total_count / total_time, flush=True)
+    print("Tracker FPS: {:.2f}".format(total_count / total_time), flush=True)
     print('', flush=True)
 
 
