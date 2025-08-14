@@ -1,6 +1,6 @@
 # Multi-Object-Tracking
 
-This repo is forked from [TrackTrack](https://github.com/kamkyu94/TrackTrack) for the Lauretta.io Intern Take Home Assignment.
+This repo is forked from [TrackTrack](https://github.com/kamkyu94/TrackTrack) for the Lauretta.io Intern Take Home Assignment. My submission pdf can be found [here](https://github.com/Razan1412/Multi-Object-Tracking/blob/main/PDFs/Lauretta.io%20Submission%20-%20Razan.pdf). A pull request containing the key changes I made can be found for review [here](https://github.com/Razan1412/Multi-Object-Tracking/pull/1).
 
 ## Setup Instructions
 
