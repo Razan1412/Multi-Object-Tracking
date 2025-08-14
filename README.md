@@ -40,7 +40,7 @@ Download [mot17_half_sbs_S50.pth](https://drive.google.com/file/d/1kTG7mVNhYGicR
 
 ### Expected Directory Structure:
 
-After completing setup steps, your project should look like this (relevant files only):
+After completing setup steps, your project (relevant files) should look like this:
 
 ```
 Multi-Object-Tracking/
